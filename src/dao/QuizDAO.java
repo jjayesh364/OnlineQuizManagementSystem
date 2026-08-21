@@ -77,12 +77,13 @@ public class QuizDAO {
 
             while (resultSet.next()) {
 
-                Quiz quiz = new Quiz(
-                    resultSet.getInt("quiz_id"),
-                    resultSet.getString("title"),
-                    resultSet.getString("description"),
-                    resultSet.getInt("duration")
-                );
+            	Quiz quiz = new Quiz(
+            		    resultSet.getInt("quiz_id"),
+            		    resultSet.getString("title"),
+            		    resultSet.getString("description"),
+            		    resultSet.getInt("duration"),
+            		    resultSet.getInt("created_by")
+            		);
 
                 quizzes.add(quiz);
             }
@@ -131,6 +132,7 @@ public class QuizDAO {
         return quizzes;
     }
     public Quiz getQuizById(int quizId) {
+
         String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
@@ -141,16 +143,19 @@ public class QuizDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
 
                 if (resultSet.next()) {
+
                     return new Quiz(
                         resultSet.getInt("quiz_id"),
                         resultSet.getString("title"),
                         resultSet.getString("description"),
-                        resultSet.getInt("duration")
+                        resultSet.getInt("duration"),
+                        resultSet.getInt("created_by")
                     );
                 }
             }
 
         } catch (SQLException e) {
+
             e.printStackTrace();
         }
 

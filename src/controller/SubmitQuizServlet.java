@@ -28,7 +28,10 @@ public class SubmitQuizServlet extends HttpServlet {
                           HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get logged-in user
+        // ==========================================
+        // 1. Check login
+        // ==========================================
+
         HttpSession session = request.getSession(false);
 
         if (session == null ||
@@ -38,11 +41,22 @@ public class SubmitQuizServlet extends HttpServlet {
             return;
         }
 
-        User user =
-                (User) session.getAttribute("user");
+        // ==========================================
+        // 2. Only STUDENTS can submit MCQ tests
+        // ==========================================
 
+        User user = (User) session.getAttribute("user");
 
-        // Get quiz ID
+        if (!"STUDENT".equalsIgnoreCase(user.getRole())) {
+
+            response.sendRedirect("dashboard.jsp");
+            return;
+        }
+
+        // ==========================================
+        // 3. Get Quiz ID
+        // ==========================================
+
         String quizIdParameter =
                 request.getParameter("quizId");
 
@@ -55,8 +69,10 @@ public class SubmitQuizServlet extends HttpServlet {
         int quizId =
                 Integer.parseInt(quizIdParameter);
 
+        // ==========================================
+        // 4. Get Quiz
+        // ==========================================
 
-        // Get quiz details
         QuizDAO quizDAO = new QuizDAO();
 
         Quiz quiz =
@@ -68,8 +84,10 @@ public class SubmitQuizServlet extends HttpServlet {
             return;
         }
 
+        // ==========================================
+        // 5. Get quiz start time
+        // ==========================================
 
-        // Get quiz start time from session
         String startTimeKey =
                 "quizStartTime_" + quizId;
 
@@ -85,67 +103,65 @@ public class SubmitQuizServlet extends HttpServlet {
         long startTime =
                 (Long) startTimeObject;
 
+        // ==========================================
+        // 6. Check time
+        // ==========================================
 
-        // Current server time
         long currentTime =
                 System.currentTimeMillis();
 
-
-        // Calculate elapsed time in milliseconds
         long elapsedTime =
                 currentTime - startTime;
 
-
-        // Convert quiz duration into milliseconds
         long allowedTime =
                 quiz.getDuration() * 60L * 1000L;
 
-
-        /*
-         * Check whether the quiz time has expired.
-         *
-         * The result will still be processed, but the
-         * server knows whether the submission was late.
-         */
         boolean timeExpired =
                 elapsedTime > allowedTime;
 
+        // ==========================================
+        // 7. Get MCQ questions
+        // ==========================================
 
-        // Get questions
         QuestionDAO questionDAO =
                 new QuestionDAO();
 
         List<Question> questions =
                 questionDAO.getQuestionsByQuizId(quizId);
 
+        // ==========================================
+        // 8. Calculate MCQ score
+        // ==========================================
 
-        // Calculate score
         int score = 0;
 
         for (Question question : questions) {
 
             String selectedAnswer =
                     request.getParameter(
-                        "question_" +
-                        question.getQuestionId()
+                            "question_" +
+                            question.getQuestionId()
                     );
-
 
             if (selectedAnswer != null &&
                 selectedAnswer.equals(
-                    question.getCorrectAnswer())) {
+                        question.getCorrectAnswer())) {
 
                 score++;
             }
         }
 
+        // ==========================================
+        // 9. Total questions
+        // ==========================================
 
-        // Total questions
         int totalQuestions =
                 questions.size();
 
+        // ==========================================
+        // 10. Calculate percentage
+        // ==========================================
 
-        // Calculate percentage
         double percentage = 0;
 
         if (totalQuestions > 0) {
@@ -155,8 +171,10 @@ public class SubmitQuizServlet extends HttpServlet {
                     totalQuestions) * 100;
         }
 
+        // ==========================================
+        // 11. Create MCQ result
+        // ==========================================
 
-        // Create result
         Result result = new Result(
                 0,
                 user.getId(),
@@ -167,18 +185,25 @@ public class SubmitQuizServlet extends HttpServlet {
                 null
         );
 
+        // ==========================================
+        // 12. Save result
+        // ==========================================
 
-        // Save result
         ResultDAO resultDAO =
                 new ResultDAO();
 
         boolean saved =
                 resultDAO.saveResult(result);
 
+        // ==========================================
+        // 13. Remove quiz timer
+        // ==========================================
 
-        // Remove start time after submission
         session.removeAttribute(startTimeKey);
 
+        // ==========================================
+        // 14. Show result
+        // ==========================================
 
         if (saved) {
 
@@ -197,15 +222,10 @@ public class SubmitQuizServlet extends HttpServlet {
                     percentage
             );
 
-            /*
-             * Send information about whether the
-             * submission happened after the time limit.
-             */
             request.setAttribute(
                     "timeExpired",
                     timeExpired
             );
-
 
             request.getRequestDispatcher(
                     "result.jsp"

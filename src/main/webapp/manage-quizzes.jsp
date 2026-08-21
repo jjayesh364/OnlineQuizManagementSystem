@@ -96,18 +96,22 @@
 
 
                         <p>
+    <a href="AddQuestionServlet?quizId=<%= quiz.getQuizId() %>">
+        Add Questions
+    </a>
 
-                            <a href="AddQuestionServlet?quizId=<%= quiz.getQuizId() %>">
-                                Add Questions
-                            </a>
+    &nbsp; | &nbsp;
 
-                            &nbsp; | &nbsp;
+    <a href="ViewQuestionsServlet?quizId=<%= quiz.getQuizId() %>">
+        View Questions
+    </a>
 
-                            <a href="ViewQuestionsServlet?quizId=<%= quiz.getQuizId() %>">
-                                View Questions
-                            </a>
+    &nbsp; | &nbsp;
 
-                        </p>
+    <a href="CreateCodingQuestionServlet?quizId=<%= quiz.getQuizId() %>">
+        Create Coding Question
+    </a>
+</p>
 
 
                         <p>

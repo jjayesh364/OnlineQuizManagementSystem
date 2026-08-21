@@ -1,22 +1,29 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java"
+         contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
 
 <%@ page import="model.User" %>
 
 <%
     User user = (User) session.getAttribute("user");
 
+    // Check login
     if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
 
-    if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+    // ADMIN and FACULTY can add questions
+    if (!"ADMIN".equalsIgnoreCase(user.getRole())
+            && !"FACULTY".equalsIgnoreCase(user.getRole())) {
+
         response.sendRedirect("dashboard.jsp");
         return;
     }
 
-    Integer quizId = (Integer) request.getAttribute("quizId");
+    // Get quiz ID
+    Integer quizId =
+            (Integer) request.getAttribute("quizId");
 
     if (quizId == null) {
         response.sendRedirect("ManageQuizServlet");
@@ -25,6 +32,7 @@
 %>
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
@@ -41,25 +49,34 @@
 
     <div class="container">
 
+        <!-- Header -->
+
         <div class="card">
 
             <h1>Add Question</h1>
 
             <p>
-                <strong>Quiz ID:</strong> <%= quizId %>
+                <strong>Quiz ID:</strong>
+                <%= quizId %>
             </p>
 
         </div>
 
 
+        <!-- Question Form -->
+
         <div class="card">
 
             <form action="AddQuestionServlet" method="post">
+
+                <!-- Quiz ID -->
 
                 <input type="hidden"
                        name="quizId"
                        value="<%= quizId %>">
 
+
+                <!-- Question -->
 
                 <label>
                     <strong>Question:</strong>
@@ -77,6 +94,8 @@
                 <br><br>
 
 
+                <!-- Option A -->
+
                 <label>
                     <strong>Option A:</strong>
                 </label>
@@ -91,6 +110,8 @@
 
                 <br><br>
 
+
+                <!-- Option B -->
 
                 <label>
                     <strong>Option B:</strong>
@@ -107,6 +128,8 @@
                 <br><br>
 
 
+                <!-- Option C -->
+
                 <label>
                     <strong>Option C:</strong>
                 </label>
@@ -121,6 +144,8 @@
 
                 <br><br>
 
+
+                <!-- Option D -->
 
                 <label>
                     <strong>Option D:</strong>
@@ -137,6 +162,8 @@
                 <br><br>
 
 
+                <!-- Correct Answer -->
+
                 <label>
                     <strong>Correct Answer:</strong>
                 </label>
@@ -149,19 +176,29 @@
                         -- Select Correct Answer --
                     </option>
 
-                    <option value="A">A</option>
+                    <option value="A">
+                        A
+                    </option>
 
-                    <option value="B">B</option>
+                    <option value="B">
+                        B
+                    </option>
 
-                    <option value="C">C</option>
+                    <option value="C">
+                        C
+                    </option>
 
-                    <option value="D">D</option>
+                    <option value="D">
+                        D
+                    </option>
 
                 </select>
 
 
                 <br><br>
 
+
+                <!-- Submit -->
 
                 <button type="submit">
                     Add Question
@@ -171,6 +208,8 @@
 
         </div>
 
+
+        <!-- Navigation -->
 
         <div class="card">
 

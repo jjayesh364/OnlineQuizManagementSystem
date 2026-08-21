@@ -1,16 +1,35 @@
+/* ==========================================
+   GLOBAL
+   ========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f6f8;
     color: #222;
+    line-height: 1.6;
 }
+
+
+/* ==========================================
+   MAIN CONTAINER
+   ========================================== */
 
 .container {
     width: 80%;
     max-width: 1000px;
     margin: 40px auto;
 }
+
+
+/* ==========================================
+   CARDS
+   ========================================== */
 
 .card {
     background-color: white;
@@ -20,8 +39,14 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+
+/* ==========================================
+   HEADINGS
+   ========================================== */
+
 h1 {
     color: #1f2937;
+    margin-top: 0;
 }
 
 h2 {
@@ -32,6 +57,11 @@ h3 {
     color: #4b5563;
 }
 
+
+/* ==========================================
+   LINKS
+   ========================================== */
+
 a {
     color: #2563eb;
     text-decoration: none;
@@ -41,6 +71,11 @@ a:hover {
     text-decoration: underline;
 }
 
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
 button {
     background-color: #2563eb;
     color: white;
@@ -48,26 +83,57 @@ button {
     padding: 10px 18px;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 15px;
 }
 
 button:hover {
     background-color: #1d4ed8;
 }
 
+
+/* ==========================================
+   FORM ELEMENTS
+   ========================================== */
+
 input,
 textarea,
 select {
+    width: 100%;
     padding: 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     margin-top: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
 }
+
+textarea {
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+
+/* ==========================================
+   HORIZONTAL LINE
+   ========================================== */
 
 hr {
     border: 0;
     border-top: 1px solid #ddd;
     margin: 25px 0;
 }
+
+
+/* ==========================================
+   STATUS COLORS
+   ========================================== */
 
 .success {
     color: #16a34a;
@@ -77,6 +143,11 @@ hr {
     color: #dc2626;
 }
 
+
+/* ==========================================
+   NAVBAR
+   ========================================== */
+
 .navbar {
     background-color: #1f2937;
     padding: 15px 30px;
@@ -85,4 +156,295 @@ hr {
 .navbar a {
     color: white;
     margin-right: 20px;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+
+/* ==========================================
+   QUIZ QUESTIONS
+   ========================================== */
+
+.question {
+    padding: 20px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.question:last-child {
+    border-bottom: none;
+}
+
+.question-text {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.option {
+    display: block;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.option:hover {
+    background-color: #f3f4f6;
+}
+
+.option input {
+    width: auto;
+    margin-right: 10px;
+}
+
+
+/* ==========================================
+   QUIZ TIMER
+   ========================================== */
+
+.timer-box {
+    background-color: #f1f5f9;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#timer {
+    margin-left: 8px;
+    color: #dc2626;
+    font-size: 24px;
+}
+
+#timer.warning {
+    color: #991b1b;
+}
+
+
+/* ==========================================
+   QUIZ SUBMIT
+   ========================================== */
+
+.quiz-submit {
+    margin-top: 25px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    background-color: #2563eb;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.quiz-submit:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* ==========================================
+   CODING QUESTION
+   ========================================== */
+
+.coding-question {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background-color: #f8fafc;
+}
+
+.coding-question h2 {
+    color: #1e3a5f;
+    margin-top: 0;
+}
+
+.coding-question p {
+    line-height: 1.6;
+}
+
+
+/* ==========================================
+   CODING BUTTON
+   ========================================== */
+
+.coding-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 20px;
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.coding-button:hover {
+    background-color: #1d4ed8;
+    text-decoration: none;
+}
+
+
+/* ==========================================
+   CODING EDITOR
+   ========================================== */
+
+.code-editor {
+    width: 100%;
+    min-height: 350px;
+    box-sizing: border-box;
+    padding: 15px;
+    font-family: Consolas, monospace;
+    font-size: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    resize: vertical;
+}
+
+
+/* ==========================================
+   SAMPLE TEST CASE
+   ========================================== */
+
+.sample-box {
+    background-color: #f8fafc;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.sample-box h3 {
+    margin-top: 0;
+    color: #1e3a5f;
+}
+
+
+/* ==========================================
+   CODE / OUTPUT DISPLAY
+   ========================================== */
+
+pre {
+    background-color: #111827;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+
+/* ==========================================
+   RESULT PAGES
+   ========================================== */
+
+.result-header {
+    text-align: center;
+}
+
+.score-box {
+    text-align: center;
+}
+
+.score {
+    font-size: 42px;
+    font-weight: bold;
+    color: #2563eb;
+    margin: 15px 0;
+}
+
+.percentage {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.result-links {
+    text-align: center;
+}
+
+.result-links p {
+    margin: 12px 0;
+}
+
+
+/* ==========================================
+   SUCCESS MESSAGE
+   ========================================== */
+
+.success-message {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+
+/* ==========================================
+   WARNING MESSAGE
+   ========================================== */
+
+.time-warning {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+
+/* ==========================================
+   DANGER LINKS
+   ========================================== */
+
+a.danger {
+    color: #dc2626;
+}
+
+a.danger:hover {
+    color: #b91c1c;
+}
+
+
+/* ==========================================
+   MOBILE RESPONSIVENESS
+   ========================================== */
+
+@media (max-width: 768px) {
+
+    .container {
+        width: 94%;
+        margin: 20px auto;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .quiz-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .timer-box {
+        width: 100%;
+        text-align: center;
+    }
+
+    .navbar {
+        padding: 15px;
+    }
+
+    .navbar a {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
 }

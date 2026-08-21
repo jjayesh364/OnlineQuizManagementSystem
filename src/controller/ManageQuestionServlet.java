@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import model.Quiz;
 import model.User;
 
@@ -18,39 +19,72 @@ public class ManageQuestionServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
         // Check login
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null ||
+            session.getAttribute("user") == null) {
+
             response.sendRedirect("login.jsp");
             return;
         }
 
-        // Check admin
-        User user = (User) session.getAttribute("user");
+        // Get logged-in user
+        User user =
+                (User) session.getAttribute("user");
 
-        if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+        QuizDAO quizDAO =
+                new QuizDAO();
+
+        List<Quiz> quizzes;
+
+        // ADMIN can manage questions for all quizzes
+        if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+
+            quizzes =
+                    quizDAO.getAllQuizzes();
+
+        }
+
+        // FACULTY can manage questions for their own quizzes
+        else if ("FACULTY".equalsIgnoreCase(user.getRole())) {
+
+            quizzes =
+                    quizDAO.getQuizzesByCreatedBy(
+                            user.getId()
+                    );
+
+        }
+
+        // STUDENTS cannot manage questions
+        else {
+
             response.sendRedirect("dashboard.jsp");
             return;
         }
 
-        // Get all quizzes
-        QuizDAO quizDAO = new QuizDAO();
-
-        List<Quiz> quizzes = quizDAO.getAllQuizzes();
-
         // Send quizzes to JSP
-        request.setAttribute("quizzes", quizzes);
+        request.setAttribute(
+                "quizzes",
+                quizzes
+        );
 
-        request.getRequestDispatcher("manage-questions.jsp")
-               .forward(request, response);
+        request.getRequestDispatcher(
+                "manage-questions.jsp"
+        ).forward(
+                request,
+                response
+        );
     }
 
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
         doGet(request, response);

@@ -3,13 +3,17 @@ package controller;
 import java.io.IOException;
 import java.util.List;
 
+import dao.CodingSubmissionDAO;
 import dao.ResultDAO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+import model.CodingSubmission;
 import model.Result;
 import model.User;
 
@@ -18,29 +22,68 @@ public class MyResultsServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
-        // Check if user is logged in
-        if (session == null || session.getAttribute("user") == null) {
+        // Check login
+        if (session == null ||
+            session.getAttribute("user") == null) {
+
             response.sendRedirect("login.jsp");
             return;
         }
 
         // Get logged-in user
-        User user = (User) session.getAttribute("user");
+        User user =
+                (User) session.getAttribute("user");
 
-        // Get results for this user
-        ResultDAO resultDAO = new ResultDAO();
+        // ==========================================
+        // Get MCQ results
+        // ==========================================
 
-        List<Result> results = resultDAO.getResultsByUserId(user.getId());
+        ResultDAO resultDAO =
+                new ResultDAO();
 
-        // Send results to JSP
-        request.setAttribute("results", results);
+        List<Result> results =
+                resultDAO.getResultsByUserId(
+                        user.getId()
+                );
 
-        request.getRequestDispatcher("my-results.jsp")
-               .forward(request, response);
+        // ==========================================
+        // Get coding submissions
+        // ==========================================
+
+        CodingSubmissionDAO codingSubmissionDAO =
+                new CodingSubmissionDAO();
+
+        List<CodingSubmission> codingSubmissions =
+                codingSubmissionDAO.getSubmissionsByStudentId(
+                        user.getId()
+                );
+
+        // ==========================================
+        // Send data to JSP
+        // ==========================================
+
+        request.setAttribute(
+                "results",
+                results
+        );
+
+        request.setAttribute(
+                "codingSubmissions",
+                codingSubmissions
+        );
+
+        request.getRequestDispatcher(
+                "my-results.jsp"
+        ).forward(
+                request,
+                response
+        );
     }
 }

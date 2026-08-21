@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 
 import dao.QuizDAO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,25 +19,49 @@ public class CreateQuizServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-
     protected void doGet(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("create-quiz.jsp")
-               .forward(request, response);
+        // Check login
+        HttpSession session =
+                request.getSession(false);
+
+        if (session == null ||
+            session.getAttribute("user") == null) {
+
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        // Check role
+        User user =
+                (User) session.getAttribute("user");
+
+        // ADMIN and FACULTY can create quizzes
+        if (!"ADMIN".equalsIgnoreCase(user.getRole())
+                && !"FACULTY".equalsIgnoreCase(user.getRole())) {
+
+            response.sendRedirect("dashboard.jsp");
+            return;
+        }
+
+        request.getRequestDispatcher(
+                "create-quiz.jsp"
+        ).forward(
+                request,
+                response
+        );
     }
 
 
     protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
+                           HttpServletResponse response)
             throws ServletException, IOException {
-
 
         // Get current session
         HttpSession session =
                 request.getSession(false);
-
 
         // Check login
         if (session == null ||
@@ -46,19 +71,17 @@ public class CreateQuizServlet extends HttpServlet {
             return;
         }
 
-
         // Get logged-in user
         User user =
                 (User) session.getAttribute("user");
 
-
-        // Only FACULTY can create quizzes
-        if (!"FACULTY".equalsIgnoreCase(user.getRole())) {
+        // ADMIN and FACULTY can create quizzes
+        if (!"ADMIN".equalsIgnoreCase(user.getRole())
+                && !"FACULTY".equalsIgnoreCase(user.getRole())) {
 
             response.sendRedirect("dashboard.jsp");
             return;
         }
-
 
         // Get form data
         String title =
@@ -69,19 +92,18 @@ public class CreateQuizServlet extends HttpServlet {
 
         int duration =
                 Integer.parseInt(
-                    request.getParameter("duration")
+                        request.getParameter("duration")
                 );
 
-
-        // Create quiz with faculty ID
-        Quiz quiz = new Quiz(
-                0,
-                title,
-                description,
-                duration,
-                user.getId()
-        );
-
+        // Create quiz with creator's ID
+        Quiz quiz =
+                new Quiz(
+                        0,
+                        title,
+                        description,
+                        duration,
+                        user.getId()
+                );
 
         // Save quiz
         QuizDAO quizDAO =
@@ -89,7 +111,6 @@ public class CreateQuizServlet extends HttpServlet {
 
         boolean created =
                 quizDAO.createQuiz(quiz);
-
 
         if (created) {
 

@@ -4,21 +4,57 @@
 
 <%@ page import="java.util.List" %>
 <%@ page import="model.Question" %>
+<%@ page import="model.CodingQuestion" %>
+
+<%
+    // ==========================================
+    // Check login
+    // ==========================================
+
+    if (session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    // ==========================================
+    // Get MCQ questions
+    // ==========================================
+
+    List<Question> questions =
+            (List<Question>) request.getAttribute("questions");
+
+    // ==========================================
+    // Get coding questions
+    // ==========================================
+
+    List<CodingQuestion> codingQuestions =
+            (List<CodingQuestion>) request.getAttribute("codingQuestions");
+
+    // ==========================================
+    // Get quiz ID
+    // ==========================================
+
+    Integer quizId =
+            (Integer) request.getAttribute("quizId");
+%>
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
     <meta charset="UTF-8">
 
-    <title>Online Quiz</title>
+    <title>Quiz</title>
 
     <link rel="stylesheet" href="style.css">
 
     <style>
 
-        /* Quiz Header */
+        /* ==========================================
+           QUIZ HEADER
+           ========================================== */
 
         .quiz-header {
             display: flex;
@@ -30,8 +66,9 @@
             margin: 0;
         }
 
-
-        /* Timer */
+        /* ==========================================
+           TIMER
+           ========================================== */
 
         .timer-box {
             background: #f1f5f9;
@@ -51,8 +88,9 @@
             color: #991b1b;
         }
 
-
-        /* Question */
+        /* ==========================================
+           MCQ QUESTION
+           ========================================== */
 
         .question {
             padding: 20px 0;
@@ -74,9 +112,6 @@
             margin-bottom: 15px;
         }
 
-
-        /* Options */
-
         .option {
             display: block;
             padding: 12px 15px;
@@ -95,8 +130,9 @@
             margin-right: 10px;
         }
 
-
-        /* Submit Button */
+        /* ==========================================
+           MCQ SUBMIT BUTTON
+           ========================================== */
 
         .quiz-submit {
             margin-top: 25px;
@@ -113,6 +149,49 @@
             background: #1d4ed8;
         }
 
+        /* ==========================================
+           CODING QUESTIONS
+           ========================================== */
+
+        .coding-question {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .coding-question h2 {
+            color: #1e3a5f;
+            margin-top: 0;
+        }
+
+        .coding-question p {
+            line-height: 1.6;
+        }
+
+        .coding-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .coding-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* ==========================================
+           CODING SECTION
+           ========================================== */
+
+        .coding-section {
+            margin-top: 25px;
+        }
+
     </style>
 
 </head>
@@ -120,30 +199,18 @@
 
 <body>
 
-<%
-
-    List questions =
-            (List) request.getAttribute("questions");
-
-    Integer quizId =
-            (Integer) request.getAttribute("quizId");
-
-    Integer duration =
-            (Integer) request.getAttribute("duration");
-
-%>
-
-
 <div class="container">
 
 
-    <!-- Quiz Header -->
+    <!-- ==========================================
+         QUIZ HEADER
+         ========================================== -->
 
     <div class="card quiz-header">
 
         <div>
 
-            <h1>Online Quiz</h1>
+            <h1>Quiz</h1>
 
             <p>
                 Answer all questions before the time expires.
@@ -166,138 +233,152 @@
 
 
 
-    <!-- Quiz Questions -->
+    <!-- ==========================================
+         MCQ QUESTIONS
+         ========================================== -->
 
     <div class="card">
+
+        <h2>MCQ Questions</h2>
+
 
         <form id="quizForm"
               action="SubmitQuizServlet"
               method="post">
 
 
+            <!-- Quiz ID -->
+
             <input type="hidden"
                    name="quizId"
                    value="<%= quizId %>">
 
 
-<%
+            <%
 
-    if (questions != null && !questions.isEmpty()) {
+                if (questions != null &&
+                    !questions.isEmpty()) {
 
-        int questionNumber = 1;
+                    int questionNumber = 1;
 
-        for (Object obj : questions) {
+                    for (Question question : questions) {
 
-            Question question =
-                    (Question) obj;
-
-%>
+            %>
 
 
-            <div class="question">
+                        <div class="question">
 
 
-                <h3>
-                    Question <%= questionNumber %>
-                </h3>
+                            <h3>
+
+                                Question <%= questionNumber %>
+
+                            </h3>
 
 
-                <p class="question-text">
+                            <p class="question-text">
 
-                    <%= question.getQuestionText() %>
+                                <%= question.getQuestionText() %>
 
-                </p>
-
-
-                <!-- Option A -->
-
-                <label class="option">
-
-                    <input type="radio"
-                           name="question_<%= question.getQuestionId() %>"
-                           value="A">
-
-                    <%= question.getOptionA() %>
-
-                </label>
+                            </p>
 
 
-                <!-- Option B -->
+                            <!-- Option A -->
 
-                <label class="option">
+                            <label class="option">
 
-                    <input type="radio"
-                           name="question_<%= question.getQuestionId() %>"
-                           value="B">
+                                <input
+                                    type="radio"
+                                    name="question_<%= question.getQuestionId() %>"
+                                    value="A">
 
-                    <%= question.getOptionB() %>
+                                <%= question.getOptionA() %>
 
-                </label>
-
-
-                <!-- Option C -->
-
-                <label class="option">
-
-                    <input type="radio"
-                           name="question_<%= question.getQuestionId() %>"
-                           value="C">
-
-                    <%= question.getOptionC() %>
-
-                </label>
+                            </label>
 
 
-                <!-- Option D -->
+                            <!-- Option B -->
 
-                <label class="option">
+                            <label class="option">
 
-                    <input type="radio"
-                           name="question_<%= question.getQuestionId() %>"
-                           value="D">
+                                <input
+                                    type="radio"
+                                    name="question_<%= question.getQuestionId() %>"
+                                    value="B">
 
-                    <%= question.getOptionD() %>
+                                <%= question.getOptionB() %>
 
-                </label>
-
-
-            </div>
+                            </label>
 
 
-<%
+                            <!-- Option C -->
 
-            questionNumber++;
+                            <label class="option">
 
-        }
+                                <input
+                                    type="radio"
+                                    name="question_<%= question.getQuestionId() %>"
+                                    value="C">
 
-%>
+                                <%= question.getOptionC() %>
 
-
-            <button type="submit"
-                    class="quiz-submit">
-
-                Submit Quiz
-
-            </button>
+                            </label>
 
 
-<%
+                            <!-- Option D -->
 
-    } else {
+                            <label class="option">
 
-%>
+                                <input
+                                    type="radio"
+                                    name="question_<%= question.getQuestionId() %>"
+                                    value="D">
+
+                                <%= question.getOptionD() %>
+
+                            </label>
 
 
-        <p>
-            No questions available for this quiz.
-        </p>
+                        </div>
 
 
-<%
+            <%
 
-    }
+                        questionNumber++;
 
-%>
+                    }
+
+            %>
+
+
+                    <!-- Submit MCQ Quiz -->
+
+                    <button
+                        type="submit"
+                        class="quiz-submit">
+
+                        Submit MCQ Quiz
+
+                    </button>
+
+
+            <%
+
+                } else {
+
+            %>
+
+
+                    <p>
+                        No MCQ questions available for this quiz.
+                    </p>
+
+
+            <%
+
+                }
+
+            %>
 
 
         </form>
@@ -306,12 +387,172 @@
 
 
 
-    <!-- Back Button -->
+    <!-- ==========================================
+         CODING QUESTIONS
+         ========================================== -->
+
+    <%
+
+        if (codingQuestions != null &&
+            !codingQuestions.isEmpty()) {
+
+    %>
+
+
+        <div class="card coding-section">
+
+
+            <h2>Coding Questions</h2>
+
+
+            <p>
+                Solve the following programming problems.
+            </p>
+
+
+            <%
+
+                for (CodingQuestion codingQuestion :
+                        codingQuestions) {
+
+            %>
+
+
+                    <div class="coding-question">
+
+
+                        <!-- Coding Question Title -->
+
+                        <h2>
+
+                            <%= codingQuestion.getTitle() %>
+
+                        </h2>
+
+
+                        <!-- Programming Language -->
+
+                        <p>
+
+                            <strong>
+                                Programming Language:
+                            </strong>
+
+                            <%= codingQuestion.getLanguage() %>
+
+                        </p>
+
+
+                        <!-- Problem Statement -->
+
+                        <p>
+
+                            <strong>
+                                Problem Statement:
+                            </strong>
+
+                        </p>
+
+                        <p>
+
+                            <%= codingQuestion.getProblemStatement() %>
+
+                        </p>
+
+
+                        <!-- Input -->
+
+                        <p>
+
+                            <strong>
+                                Input:
+                            </strong>
+
+                        </p>
+
+                        <p>
+
+                            <%= codingQuestion.getInputDescription() %>
+
+                        </p>
+
+
+                        <!-- Output -->
+
+                        <p>
+
+                            <strong>
+                                Output:
+                            </strong>
+
+                        </p>
+
+                        <p>
+
+                            <%= codingQuestion.getOutputDescription() %>
+
+                        </p>
+
+
+                        <!-- Constraints -->
+
+                        <p>
+
+                            <strong>
+                                Constraints:
+                            </strong>
+
+                        </p>
+
+                        <p>
+
+                            <%= codingQuestion.getConstraints() %>
+
+                        </p>
+
+
+                        <!-- Solve Button -->
+
+                        <a
+                            class="coding-button"
+                            href="CodingTestServlet?codingQuestionId=<%= codingQuestion.getCodingQuestionId() %>">
+
+                            Solve Coding Question
+
+                        </a>
+
+
+                    </div>
+
+
+            <%
+
+                }
+
+            %>
+
+
+        </div>
+
+
+    <%
+
+        }
+
+    %>
+
+
+
+    <!-- ==========================================
+         BACK BUTTON
+         ========================================== -->
 
     <div class="card">
 
         <a href="QuizListServlet">
+
             Back to Quizzes
+
         </a>
 
     </div>
@@ -321,98 +562,90 @@
 
 
 
-<!-- =========================
+<!-- ==========================================
      QUIZ TIMER
-     ========================= -->
+     ========================================== -->
 
 <script>
 
-//Remaining time calculated by the server
 let timeRemaining =
     <%= request.getAttribute("remainingSeconds") != null
         ? request.getAttribute("remainingSeconds")
         : 0 %>;
 
 
-    const timer =
-        document.getElementById("timer");
-
-    const quizForm =
-        document.getElementById("quizForm");
+const timer =
+    document.getElementById("timer");
 
 
-    function updateTimer() {
-
-        let minutes =
-            Math.floor(timeRemaining / 60);
-
-        let seconds =
-            timeRemaining % 60;
+const quizForm =
+    document.getElementById("quizForm");
 
 
-        // Add leading zero
+function updateTimer() {
 
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
+    let minutes =
+        Math.floor(timeRemaining / 60);
 
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
+    let seconds =
+        timeRemaining % 60;
 
 
-        // Display timer
+    if (minutes < 10) {
 
-        timer.textContent =
-            minutes + ":" + seconds;
-
-
-        // Warning when one minute remains
-
-        if (timeRemaining <= 60) {
-
-            timer.classList.add("warning");
-
-        }
-
-
-        // Time expired
-
-        if (timeRemaining <= 0) {
-
-            clearInterval(timerInterval);
-
-
-            alert(
-                "Time is over! Your quiz will be submitted automatically."
-            );
-
-
-            if (quizForm) {
-
-                quizForm.submit();
-
-            }
-
-            return;
-
-        }
-
-
-        timeRemaining--;
+        minutes = "0" + minutes;
 
     }
 
 
-    // Display timer immediately
+    if (seconds < 10) {
 
-    updateTimer();
+        seconds = "0" + seconds;
+
+    }
 
 
-    // Update every second
+    timer.textContent =
+        minutes + ":" + seconds;
 
-    const timerInterval =
-        setInterval(updateTimer, 1000);
+
+    if (timeRemaining <= 60) {
+
+        timer.classList.add("warning");
+
+    }
+
+
+    if (timeRemaining <= 0) {
+
+        clearInterval(timerInterval);
+
+        alert(
+            "Time is over! Your MCQ quiz will be submitted automatically."
+        );
+
+
+        if (quizForm) {
+
+            quizForm.submit();
+
+        }
+
+        return;
+
+    }
+
+
+    timeRemaining--;
+
+}
+
+
+updateTimer();
+
+
+const timerInterval =
+    setInterval(updateTimer, 1000);
 
 </script>
 
