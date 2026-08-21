@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import model.Quiz;
 import model.User;
 
@@ -18,34 +19,70 @@ public class ManageQuizServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
 
         // Check login
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null ||
+            session.getAttribute("user") == null) {
+
             response.sendRedirect("login.jsp");
             return;
         }
 
-        // Check admin role
-        User user = (User) session.getAttribute("user");
 
-        if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+        // Get logged-in user
+        User user =
+                (User) session.getAttribute("user");
+
+
+        QuizDAO quizDAO =
+                new QuizDAO();
+
+        List<Quiz> quizzes;
+
+
+        // ADMIN can see all quizzes
+        if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+
+            quizzes =
+                    quizDAO.getAllQuizzes();
+
+        }
+
+        // FACULTY can see only their own quizzes
+        else if ("FACULTY".equalsIgnoreCase(user.getRole())) {
+
+            quizzes =
+                    quizDAO.getQuizzesByCreatedBy(
+                            user.getId()
+                    );
+
+        }
+
+        // STUDENTS cannot manage quizzes
+        else {
+
             response.sendRedirect("dashboard.jsp");
             return;
         }
 
-        // Get all quizzes
-        QuizDAO quizDAO = new QuizDAO();
-
-        List<Quiz> quizzes = quizDAO.getAllQuizzes();
 
         // Send quizzes to JSP
-        request.setAttribute("quizzes", quizzes);
+        request.setAttribute(
+                "quizzes",
+                quizzes
+        );
 
-        request.getRequestDispatcher("manage-quizzes.jsp")
-               .forward(request, response);
+
+        request.getRequestDispatcher(
+                "manage-quizzes.jsp"
+        ).forward(
+                request,
+                response
+        );
     }
 }

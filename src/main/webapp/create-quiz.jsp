@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java"
+         contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
 
 <%@ page import="model.User" %>
 
@@ -11,7 +12,12 @@
         return;
     }
 
-    if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+    // Allow both ADMIN and FACULTY
+    String role = user.getRole();
+
+    if (!"ADMIN".equalsIgnoreCase(role)
+            && !"FACULTY".equalsIgnoreCase(role)) {
+
         response.sendRedirect("dashboard.jsp");
         return;
     }
@@ -34,9 +40,13 @@
 
     <div class="container">
 
+        <!-- Header -->
+
         <div class="card">
 
-            <h1>Create New Quiz</h1>
+            <h1>Online Quiz Management System</h1>
+
+            <h2>Create New Quiz</h2>
 
             <p>
                 Create a new quiz for students.
@@ -44,6 +54,8 @@
 
         </div>
 
+
+        <!-- Create Quiz Form -->
 
         <div class="card">
 
@@ -108,10 +120,12 @@
         </div>
 
 
+        <!-- Back -->
+
         <div class="card">
 
-            <a href="admin-dashboard.jsp">
-                Back to Admin Dashboard
+            <a href="dashboard.jsp">
+                Back to Dashboard
             </a>
 
         </div>

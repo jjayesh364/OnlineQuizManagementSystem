@@ -10,28 +10,58 @@ import java.sql.ResultSet;
 
 public class QuizDAO {
 
-    // Create a quiz
-    public boolean createQuiz(Quiz quiz) {
+	// Create a quiz
+	public boolean createQuiz(Quiz quiz) {
 
-        String sql = "INSERT INTO quizzes (title, description, duration) " +
-                     "VALUES (?, ?, ?)";
+	    String sql = "INSERT INTO quizzes " +
+	                 "(title, description, duration, created_by) " +
+	                 "VALUES (?, ?, ?, ?)";
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+	    try (Connection connection =
+	                 DatabaseConnection.getConnection();
 
-            statement.setString(1, quiz.getTitle());
-            statement.setString(2, quiz.getDescription());
-            statement.setInt(3, quiz.getDuration());
+	         PreparedStatement statement =
+	                 connection.prepareStatement(sql)) {
 
-            int rows = statement.executeUpdate();
 
-            return rows > 0;
+	        statement.setString(
+	                1,
+	                quiz.getTitle()
+	        );
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+
+	        statement.setString(
+	                2,
+	                quiz.getDescription()
+	        );
+
+
+	        statement.setInt(
+	                3,
+	                quiz.getDuration()
+	        );
+
+
+	        statement.setInt(
+	                4,
+	                quiz.getCreatedBy()
+	        );
+
+
+	        int rows =
+	                statement.executeUpdate();
+
+
+	        return rows > 0;
+
+
+	    } catch (SQLException e) {
+
+	        e.printStackTrace();
+
+	        return false;
+	    }
+	}
 
 
     // Get all quizzes
@@ -65,6 +95,41 @@ public class QuizDAO {
         }
     }
     
+ // Get quizzes created by a specific faculty member
+    public List<Quiz> getQuizzesByCreatedBy(int createdBy) {
+
+        String sql = "SELECT * FROM quizzes WHERE created_by = ?";
+
+        List<Quiz> quizzes = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, createdBy);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+
+                    Quiz quiz = new Quiz(
+                        resultSet.getInt("quiz_id"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("duration"),
+                        resultSet.getInt("created_by")
+                    );
+
+                    quizzes.add(quiz);
+                }
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
+        return quizzes;
+    }
     public Quiz getQuizById(int quizId) {
         String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
 

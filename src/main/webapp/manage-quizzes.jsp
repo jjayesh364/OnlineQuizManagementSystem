@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java"
+         contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
 
 <%@ page import="java.util.List" %>
 <%@ page import="model.Quiz" %>
@@ -13,27 +14,39 @@
         return;
     }
 
-    if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+    String role = user.getRole();
+
+    // Only ADMIN and FACULTY can manage quizzes
+    if (!"ADMIN".equalsIgnoreCase(role)
+            && !"FACULTY".equalsIgnoreCase(role)) {
+
         response.sendRedirect("dashboard.jsp");
         return;
     }
 
-    List quizzes = (List) request.getAttribute("quizzes");
+    List<Quiz> quizzes =
+            (List<Quiz>) request.getAttribute("quizzes");
 %>
 
 <!DOCTYPE html>
 <html>
 
 <head>
+
     <meta charset="UTF-8">
+
     <title>Manage Quizzes</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
     <div class="container">
+
+
+        <!-- Header -->
 
         <div class="card">
 
@@ -46,12 +59,12 @@
         </div>
 
 
+        <!-- Quiz List -->
+
         <%
             if (quizzes != null && !quizzes.isEmpty()) {
 
-                for (Object obj : quizzes) {
-
-                    Quiz quiz = (Quiz) obj;
+                for (Quiz quiz : quizzes) {
         %>
 
                     <div class="card">
@@ -60,17 +73,27 @@
                             <%= quiz.getTitle() %>
                         </h2>
 
-                        <p>
-                            <strong>Description:</strong>
-                            <%= quiz.getDescription() %>
-                        </p>
 
                         <p>
-                            <strong>Duration:</strong>
-                            <%= quiz.getDuration() %> minutes
+
+                            <strong>Description:</strong>
+
+                            <%= quiz.getDescription() %>
+
                         </p>
+
+
+                        <p>
+
+                            <strong>Duration:</strong>
+
+                            <%= quiz.getDuration() %> minutes
+
+                        </p>
+
 
                         <hr>
+
 
                         <p>
 
@@ -86,11 +109,13 @@
 
                         </p>
 
+
                         <p>
 
-                            <a href="DeleteQuizServlet?quizId=<%= quiz.getQuizId() %>"
-                               class="danger"
-                               onclick="return confirm('Are you sure you want to delete this quiz? All questions and results for this quiz will also be deleted.');">
+                            <a
+                                href="DeleteQuizServlet?quizId=<%= quiz.getQuizId() %>"
+                                class="danger"
+                                onclick="return confirm('Are you sure you want to delete this quiz? All questions and results for this quiz will also be deleted.');">
 
                                 Delete Quiz
 
@@ -121,21 +146,29 @@
         %>
 
 
+        <!-- Navigation -->
+
         <div class="card">
 
             <p>
+
                 <a href="CreateQuizServlet">
                     Create New Quiz
                 </a>
+
             </p>
 
+
             <p>
-                <a href="admin-dashboard.jsp">
-                    Back to Admin Dashboard
+
+                <a href="dashboard.jsp">
+                    Back to Dashboard
                 </a>
+
             </p>
 
         </div>
+
 
     </div>
 
