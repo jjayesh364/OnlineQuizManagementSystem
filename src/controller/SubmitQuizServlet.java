@@ -4,14 +4,18 @@ import java.io.IOException;
 import java.util.List;
 
 import dao.QuestionDAO;
+import dao.QuizDAO;
 import dao.ResultDAO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import model.Question;
+import model.Quiz;
 import model.Result;
 import model.User;
 
@@ -20,53 +24,139 @@ public class SubmitQuizServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get quiz ID
-        int quizId = Integer.parseInt(request.getParameter("quizId"));
-
-        // Get logged-in user from session
+        // Get logged-in user
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null ||
+            session.getAttribute("user") == null) {
+
             response.sendRedirect("login.jsp");
             return;
         }
 
-        User user = (User) session.getAttribute("user");
+        User user =
+                (User) session.getAttribute("user");
 
-        // Get questions for this quiz
-        QuestionDAO questionDAO = new QuestionDAO();
 
-        List<Question> questions = questionDAO.getQuestionsByQuizId(quizId);
+        // Get quiz ID
+        String quizIdParameter =
+                request.getParameter("quizId");
 
+        if (quizIdParameter == null) {
+
+            response.sendRedirect("QuizListServlet");
+            return;
+        }
+
+        int quizId =
+                Integer.parseInt(quizIdParameter);
+
+
+        // Get quiz details
+        QuizDAO quizDAO = new QuizDAO();
+
+        Quiz quiz =
+                quizDAO.getQuizById(quizId);
+
+        if (quiz == null) {
+
+            response.sendRedirect("QuizListServlet");
+            return;
+        }
+
+
+        // Get quiz start time from session
+        String startTimeKey =
+                "quizStartTime_" + quizId;
+
+        Object startTimeObject =
+                session.getAttribute(startTimeKey);
+
+        if (startTimeObject == null) {
+
+            response.sendRedirect("QuizListServlet");
+            return;
+        }
+
+        long startTime =
+                (Long) startTimeObject;
+
+
+        // Current server time
+        long currentTime =
+                System.currentTimeMillis();
+
+
+        // Calculate elapsed time in milliseconds
+        long elapsedTime =
+                currentTime - startTime;
+
+
+        // Convert quiz duration into milliseconds
+        long allowedTime =
+                quiz.getDuration() * 60L * 1000L;
+
+
+        /*
+         * Check whether the quiz time has expired.
+         *
+         * The result will still be processed, but the
+         * server knows whether the submission was late.
+         */
+        boolean timeExpired =
+                elapsedTime > allowedTime;
+
+
+        // Get questions
+        QuestionDAO questionDAO =
+                new QuestionDAO();
+
+        List<Question> questions =
+                questionDAO.getQuestionsByQuizId(quizId);
+
+
+        // Calculate score
         int score = 0;
 
-        // Check each answer
         for (Question question : questions) {
 
             String selectedAnswer =
-                    request.getParameter("question_" + question.getQuestionId());
+                    request.getParameter(
+                        "question_" +
+                        question.getQuestionId()
+                    );
+
 
             if (selectedAnswer != null &&
-                selectedAnswer.equals(question.getCorrectAnswer())) {
+                selectedAnswer.equals(
+                    question.getCorrectAnswer())) {
 
                 score++;
             }
         }
 
-        // Calculate total questions
-        int totalQuestions = questions.size();
+
+        // Total questions
+        int totalQuestions =
+                questions.size();
+
 
         // Calculate percentage
         double percentage = 0;
 
         if (totalQuestions > 0) {
-            percentage = ((double) score / totalQuestions) * 100;
+
+            percentage =
+                    ((double) score /
+                    totalQuestions) * 100;
         }
 
-        // Create Result object
+
+        // Create result
         Result result = new Result(
                 0,
                 user.getId(),
@@ -77,23 +167,58 @@ public class SubmitQuizServlet extends HttpServlet {
                 null
         );
 
-        // Save result
-        ResultDAO resultDAO = new ResultDAO();
 
-        boolean saved = resultDAO.saveResult(result);
+        // Save result
+        ResultDAO resultDAO =
+                new ResultDAO();
+
+        boolean saved =
+                resultDAO.saveResult(result);
+
+
+        // Remove start time after submission
+        session.removeAttribute(startTimeKey);
+
 
         if (saved) {
 
-            request.setAttribute("score", score);
-            request.setAttribute("totalQuestions", totalQuestions);
-            request.setAttribute("percentage", percentage);
+            request.setAttribute(
+                    "score",
+                    score
+            );
 
-            request.getRequestDispatcher("result.jsp")
-                   .forward(request, response);
+            request.setAttribute(
+                    "totalQuestions",
+                    totalQuestions
+            );
+
+            request.setAttribute(
+                    "percentage",
+                    percentage
+            );
+
+            /*
+             * Send information about whether the
+             * submission happened after the time limit.
+             */
+            request.setAttribute(
+                    "timeExpired",
+                    timeExpired
+            );
+
+
+            request.getRequestDispatcher(
+                    "result.jsp"
+            ).forward(
+                    request,
+                    response
+            );
 
         } else {
 
-            response.getWriter().println("Error saving result.");
+            response.getWriter().println(
+                    "Error saving result."
+            );
         }
     }
 }

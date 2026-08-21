@@ -64,7 +64,33 @@ public class QuizDAO {
             return quizzes;
         }
     }
+    
+    public Quiz getQuizById(int quizId) {
+        String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
 
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, quizId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    return new Quiz(
+                        resultSet.getInt("quiz_id"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("duration")
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     // Delete a quiz and its related questions/results
     public boolean deleteQuiz(int quizId) {
